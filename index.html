@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#23241A" />
+  <title>SAID — one line at a time</title>
+  <meta name="description" content="A pocket quote deck. Flick through lines, save the ones that hit, swap in your own." />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stage" id="stage">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="wordmark" id="homeBtn" aria-label="Back to the deck">
+        SAID<span class="dot"></span>
+      </button>
+      <div class="collection-name" id="collectionLabel">Momentum</div>
+      <button class="icon-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <span class="bars"></span>
+      </button>
+    </header>
+
+    <!-- ===== DECK VIEW ===== -->
+    <main class="view view--deck is-active" id="view-deck">
+      <div class="deck" id="deck">
+        <article class="card" id="card" tabindex="0" aria-live="polite">
+          <p class="quote" id="quoteText">Loading…</p>
+          <p class="attribution" id="quoteAuthor"></p>
+        </article>
+      </div>
+
+      <div class="card-actions">
+        <button class="action" id="saveBtn" aria-pressed="false" aria-label="Save this line">
+          <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M12 21s-7.5-4.7-10-9.3C.4 8.2 2 4.6 5.4 4.6c2 0 3.3 1.2 4.1 2.4C10.3 5.8 11.6 4.6 13.6 4.6c3.4 0 5 3.6 3.4 7.1C19.5 16.3 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span class="action__label" id="saveCount">Save</span>
+        </button>
+        <button class="action" id="shareBtn" aria-label="Share this line">
+          <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="action__label">Share</span>
+        </button>
+        <button class="action action--primary" id="nextBtn" aria-label="Next line">
+          <span class="action__label">Next</span>
+          <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M5 12h14m0 0-6-6m6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <p class="hint" id="hint">Tap the card or press → for the next line</p>
+    </main>
+
+    <!-- ===== SAVED VIEW ===== -->
+    <section class="view view--list" id="view-saved" aria-hidden="true">
+      <h1 class="view-title">Saved</h1>
+      <p class="view-sub" id="savedSub">The lines you kept.</p>
+      <div class="list" id="savedList"></div>
+      <div class="empty" id="savedEmpty" hidden>
+        <p>Nothing saved yet.</p>
+        <p class="empty__hint">Tap the heart on a line to keep it here.</p>
+      </div>
+    </section>
+
+    <!-- ===== COLLECTIONS VIEW ===== -->
+    <section class="view view--collections" id="view-collections" aria-hidden="true">
+      <h1 class="view-title">Collections</h1>
+      <p class="view-sub">Each one reskins the whole deck. Pick a mood.</p>
+      <div class="collection-grid" id="collectionGrid"></div>
+    </section>
+
+    <!-- ===== ADD VIEW ===== -->
+    <section class="view view--add" id="view-add" aria-hidden="true">
+      <h1 class="view-title">Add a line</h1>
+      <p class="view-sub">Your own lines live on this device and show up in the deck.</p>
+      <div class="form">
+        <label class="field">
+          <span class="field__label">The line</span>
+          <textarea id="addText" rows="3" placeholder="Type something worth re-reading…"></textarea>
+        </label>
+        <label class="field">
+          <span class="field__label">Who said it <span class="muted">(optional)</span></span>
+          <input id="addAuthor" type="text" placeholder="Leave blank for none" />
+        </label>
+        <label class="field">
+          <span class="field__label">Add to collection</span>
+          <select id="addCollection"></select>
+        </label>
+        <button class="btn-solid" id="addSubmit">Add to deck</button>
+        <p class="form__note" id="addNote" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- ===== SETTINGS VIEW ===== -->
+    <section class="view view--settings" id="view-settings" aria-hidden="true">
+      <h1 class="view-title">Settings</h1>
+
+      <div class="setting">
+        <div class="setting__text">
+          <span class="setting__title">Daily line</span>
+          <span class="setting__desc">A nudge once a day while this tab is open. Browsers can't wake a closed website — installing the app makes this reliable.</span>
+        </div>
+        <button class="toggle" id="notifyToggle" role="switch" aria-checked="false">
+          <span class="toggle__knob"></span>
+        </button>
+      </div>
+
+      <div class="setting">
+        <div class="setting__text">
+          <span class="setting__title">Reduce motion</span>
+          <span class="setting__desc">Calmer transitions. Also follows your system setting automatically.</span>
+        </div>
+        <button class="toggle" id="motionToggle" role="switch" aria-checked="false">
+          <span class="toggle__knob"></span>
+        </button>
+      </div>
+
+      <div class="setting setting--block" id="installRow" hidden>
+        <div class="setting__text">
+          <span class="setting__title">Install SAID</span>
+          <span class="setting__desc">Add it to your home screen. Works offline after that.</span>
+        </div>
+        <button class="btn-solid" id="installBtn">Install</button>
+      </div>
+
+      <div class="setting setting--block">
+        <div class="setting__text">
+          <span class="setting__title">Today's line, as a card</span>
+          <span class="setting__desc">A preview of the share image — the "widget" of the web version.</span>
+        </div>
+        <button class="btn-ghost" id="widgetBtn">Preview</button>
+      </div>
+
+      <p class="version">SAID · open source · edit <code>quotes.js</code> to make it yours</p>
+    </section>
+
+    <!-- Bottom nav -->
+    <nav class="nav" id="nav">
+      <button class="nav__item is-active" data-view="deck" aria-label="Deck">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Deck</span>
+      </button>
+      <button class="nav__item" data-view="saved" aria-label="Saved">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-10-9.3C.4 8.2 2 4.6 5.4 4.6c2 0 3.3 1.2 4.1 2.4C10.3 5.8 11.6 4.6 13.6 4.6c3.4 0 5 3.6 3.4 7.1C19.5 16.3 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Saved</span>
+      </button>
+      <button class="nav__item" data-view="collections" aria-label="Collections">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Sets</span>
+      </button>
+      <button class="nav__item" data-view="add" aria-label="Add">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-7-7h14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>Add</span>
+      </button>
+      <button class="nav__item" data-view="settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2.5M12 18.5V21M4.2 7.5l2.2 1.3M17.6 15.2l2.2 1.3M19.8 7.5l-2.2 1.3M6.4 15.2l-2.2 1.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>You</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Share / widget preview modal -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__backdrop" id="modalBackdrop"></div>
+    <div class="modal__sheet" role="dialog" aria-modal="true" aria-label="Share card">
+      <div class="share-card" id="shareCard">
+        <p class="share-card__quote" id="shareQuote"></p>
+        <p class="share-card__author" id="shareAuthor"></p>
+        <p class="share-card__mark">SAID</p>
+      </div>
+      <div class="modal__actions">
+        <button class="btn-ghost" id="copyBtn">Copy text</button>
+        <button class="btn-solid" id="modalClose">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="quotes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
