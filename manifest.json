@@ -1,7 +1,7 @@
 {
-  "name": "SAID — one line at a time",
-  "short_name": "SAID",
-  "description": "A pocket quote deck. Flick through lines, save the ones that hit, swap in your own.",
+  "name": "Future said it",
+  "short_name": "Future",
+  "description": "A pocket quote deck. One line at a time — Future said it.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

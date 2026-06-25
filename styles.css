@@ -99,7 +99,7 @@ body {
 .bars::after  { position: absolute; top: 6px; width: 12px; }
 
 /* ---------- Views ---------- */
-.view { display: none; flex: 1; flex-direction: column; padding: 0 var(--pad); }
+.view { display: none; flex: 1; flex-direction: column; padding: 0 var(--pad) calc(28px + env(safe-area-inset-bottom)); }
 .view.is-active { display: flex; }
 .view--deck.is-active { display: flex; }
 
@@ -166,15 +166,24 @@ body {
   letter-spacing: -.012em;
   text-wrap: balance;
 }
-.attribution {
+.signature {
   font-family: "Space Grotesk", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: .03em;
-  margin-top: 20px;
-  color: color-mix(in srgb, var(--on-card) 62%, transparent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: color-mix(in srgb, var(--on-card) 55%, transparent);
 }
-.attribution:empty { display: none; }
+.signature::before {
+  content: "";
+  width: 22px; height: 2px; border-radius: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
 
 /* swipe states */
 .card.is-leaving { transition: transform .32s var(--ease), opacity .32s var(--ease); }
@@ -322,27 +331,31 @@ select { appearance: none; }
 .version { font-size: 12px; color: var(--on-bg-dim); margin-top: 26px; }
 .version code { background: color-mix(in srgb, var(--on-bg) 12%, transparent); padding: 2px 6px; border-radius: 6px; }
 
-/* ---------- Bottom nav ---------- */
-.nav {
-  position: sticky; bottom: 0;
-  display: flex; justify-content: space-around;
-  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--bg) 86%, #000);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid color-mix(in srgb, var(--on-bg) 10%, transparent);
-  margin-top: 10px;
+/* ---------- Menu overlay (replaces bottom nav) ---------- */
+.menu { position: fixed; inset: 0; z-index: 40; }
+.menu[hidden] { display: none; }
+.menu__backdrop { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 80%, #000); backdrop-filter: blur(6px); animation: fade .2s; }
+.menu__sheet {
+  position: absolute; top: 0; right: 0;
+  width: min(78vw, 320px); height: 100%;
+  background: var(--bg);
+  border-left: 1px solid color-mix(in srgb, var(--on-bg) 12%, transparent);
+  display: flex; flex-direction: column;
+  padding: calc(78px + env(safe-area-inset-top)) 0 24px;
+  animation: slideIn .26s var(--ease);
 }
-.nav__item {
+@keyframes slideIn { from { transform: translateX(100%); } }
+.menu__link {
   background: none; border: 0; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  color: var(--on-bg-dim);
-  font-family: inherit; font-size: 10.5px; letter-spacing: .03em;
-  padding: 6px 12px; border-radius: 12px;
-  transition: color .2s;
+  text-align: left;
+  font-family: "Fraunces", serif;
+  font-size: 24px; font-weight: 500;
+  color: var(--on-bg);
+  padding: 16px var(--pad);
+  transition: color .15s, background .15s;
 }
-.nav__item svg { width: 22px; height: 22px; }
-.nav__item.is-active { color: var(--on-bg); }
-.nav__item.is-active svg { color: var(--accent); }
+.menu__link:hover { background: color-mix(in srgb, var(--on-bg) 7%, transparent); }
+.menu__link.is-active { color: var(--accent); }
 
 /* ---------- Modal / share card ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: end center; }
