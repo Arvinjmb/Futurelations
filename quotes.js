@@ -60,13 +60,13 @@ const QUOTES = [
 ];
 
 const BACKGROUNDS = [
-  { id: "sunburst", name: "Sunburst", bg: "#DE8150", fg: "#1B1206", accent: "#1B1206", image: "images/bg-1.jpg" },
-  { id: "orchid",   name: "Orchid",   bg: "#2C2342", fg: "#F2EEE4", accent: "#C9A9FF", image: "images/bg-2.jpg" },
-  { id: "bone",     name: "Bone",     bg: "#ECE7DB", fg: "#1A1916", accent: "#B5832E", image: "images/bg-3.jpg" },
-  { id: "ink",      name: "Ink",      bg: "#141318", fg: "#EDEAE0", accent: "#C5E063", image: "images/bg-4.jpg" }
+  { id: "bg1", name: "Mirror", bg: "#242525", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-1.jpg" },
+  { id: "bg2", name: "Eagle",  bg: "#1F1818", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-2.jpg" },
+  { id: "bg3", name: "Hood",   bg: "#312D21", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-3.jpg" },
+  { id: "bg4", name: "Chef",   bg: "#424242", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-4.jpg" }
 ];
 
-const DEFAULT_BG = "sunburst";
+const DEFAULT_BG = "bg1";
 
 if (typeof window !== "undefined") {
   window.SAID_DATA = { QUOTES, BACKGROUNDS, DEFAULT_BG };

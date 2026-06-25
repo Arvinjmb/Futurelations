@@ -24,7 +24,7 @@
     <main class="deck" id="deck">
       <div class="quote-wrap" id="quoteWrap">
         <p class="quote" id="quoteText">…</p>
-        <p class="byline" id="byline">Future said it</p>
+        <p class="byline" id="byline">Future</p>
       </div>
     </main>
 
@@ -97,18 +97,16 @@
     </nav>
   </div>
 
-  <!-- ===== Share modal ===== -->
+  <!-- ===== Share / save-image modal ===== -->
   <div class="sheet" id="modal" hidden>
     <div class="sheet__backdrop" data-close-modal></div>
-    <div class="sheet__panel sheet__panel--modal" role="dialog" aria-modal="true" aria-label="Share">
-      <div class="share-card" id="shareCard">
-        <p class="share-card__q" id="shareQuote"></p>
-        <p class="share-card__by">Future said it</p>
-      </div>
+    <div class="sheet__panel sheet__panel--modal" role="dialog" aria-modal="true" aria-label="Save image">
+      <img class="share-img" id="shareImg" alt="Quote on photo, ready to save" />
       <div class="modal__actions">
+        <button class="solid" id="saveImgBtn">Save image</button>
         <button class="ghost" id="copyBtn">Copy text</button>
-        <button class="solid" id="modalClose">Done</button>
       </div>
+      <button class="ghost modal__done" id="modalClose">Done</button>
     </div>
   </div>
 

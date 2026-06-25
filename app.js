@@ -1,5 +1,5 @@
 /* =========================================================================
-   FUTURE — app logic (clean version)
+   FUTURE — app logic (photos, double-tap background, save-to-gallery)
    ========================================================================= */
 (function () {
   "use strict";
@@ -16,8 +16,10 @@
   const idOf = (t) => "q" + Math.abs([].reduce.call(t, (h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0));
   const bgById = (id) => BACKGROUNDS.find((b) => b.id === id) || BACKGROUNDS[0];
   const allQuotes = () => QUOTES.map(norm).concat(state.custom.map(norm));
+  const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  const hexA = (h, a) => { const n = parseInt(h.slice(1), 16); return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")"; };
 
-  /* ---------- background (color, or photo if the file exists) ---------- */
+  /* ---------- background ---------- */
   function applyBackground(id) {
     const b = bgById(id);
     const root = document.documentElement.style;
@@ -26,39 +28,35 @@
     root.setProperty("--fg", b.fg);
     root.setProperty("--accent", b.accent);
     document.querySelector('meta[name="theme-color"]').setAttribute("content", b.bg);
-    // start on the solid color, then upgrade to a photo if one is present
     stage.style.backgroundImage = "none";
     stage.classList.remove("has-photo");
     if (b.image) {
-      const test = new Image();
-      test.onload = () => {
+      loadImg(b.image).then((img) => {
         if (state.bgId !== id) return;
         stage.style.backgroundImage = "url(" + b.image + ")";
         stage.classList.add("has-photo");
-        root.setProperty("--fg", "#ffffff");      // white text over the scrim
-      };
-      test.onerror = () => {};
-      test.src = b.image;
+        root.setProperty("--fg", "#ffffff");
+      }).catch(() => {});
     }
+  }
+  function cycleBackground() {
+    const i = BACKGROUNDS.findIndex((b) => b.id === state.bgId);
+    const nb = BACKGROUNDS[(i + 1) % BACKGROUNDS.length];
+    state.bgId = nb.id; persist(); applyBackground(nb.id); toast(nb.name);
   }
 
   /* ---------- deck ---------- */
   let pool = [], current = null;
-  function reshuffle() {
-    pool = allQuotes().slice();
-    for (let i = pool.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  }
+  function reshuffle() { pool = allQuotes().slice(); for (let i = pool.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [pool[i], pool[j]] = [pool[j], pool[i]]; } }
   function next() { if (!pool.length) reshuffle(); current = pool.pop(); render(); }
   function render() {
     $("#quoteText").textContent = current.text;
-    const saved = state.saved.some((s) => s.id === idOf(current.text));
-    $("#saveBtn").setAttribute("aria-pressed", String(saved));
-    const w = $("#quoteWrap");
-    w.classList.remove("is-entering"); void w.offsetWidth;
+    $("#saveBtn").setAttribute("aria-pressed", String(state.saved.some((s) => s.id === idOf(current.text))));
+    const w = $("#quoteWrap"); w.classList.remove("is-entering"); void w.offsetWidth;
     if (!state.reduceMotion) w.classList.add("is-entering");
   }
 
-  /* ---------- save / share ---------- */
+  /* ---------- save line ---------- */
   function toggleSave() {
     if (!current) return;
     const id = idOf(current.text);
@@ -67,15 +65,74 @@
     else { state.saved.unshift({ id, text: current.text }); toast("Saved"); }
     persist(); render();
   }
-  async function share() {
+
+  /* ---------- compose quote + photo into one image ---------- */
+  function wrap(ctx, text, maxW) {
+    const words = text.split(" "); const lines = []; let line = "";
+    for (const w of words) { const t = line ? line + " " + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; }
+    if (line) lines.push(line); return lines;
+  }
+  async function composeImage() {
+    const W = 1080, H = 1920;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+    const b = bgById(state.bgId);
+    let photo = null;
+    if (b.image) { try { photo = await loadImg(b.image); } catch (e) { photo = null; } }
+    const fg = photo ? "#FFFFFF" : b.fg;
+    if (photo) {
+      const ar = photo.width / photo.height, AR = W / H; let dw, dh, dx, dy;
+      if (ar > AR) { dh = H; dw = H * ar; dx = (W - dw) / 2; dy = 0; } else { dw = W; dh = W / ar; dx = 0; dy = (H - dh) / 2; }
+      ctx.drawImage(photo, dx, dy, dw, dh);
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, "rgba(0,0,0,.25)"); g.addColorStop(1, "rgba(0,0,0,.7)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    } else { ctx.fillStyle = b.bg; ctx.fillRect(0, 0, W, H); }
+
+    try { await document.fonts.load('700 84px "Space Grotesk"'); } catch (e) {}
+    const pad = 96, maxW = W - pad * 2;
+    let size = 84; ctx.font = '700 ' + size + 'px "Space Grotesk", sans-serif';
+    let lines = wrap(ctx, current.text, maxW);
+    while (lines.length * size * 1.16 > H * 0.5 && size > 44) { size -= 6; ctx.font = '700 ' + size + 'px "Space Grotesk", sans-serif'; lines = wrap(ctx, current.text, maxW); }
+    const lh = size * 1.16, blockH = lines.length * lh;
+    const startY = H * 0.6 - blockH / 2 + size * 0.8;
+    ctx.fillStyle = fg; ctx.textAlign = "left";
+    lines.forEach((ln, i) => ctx.fillText(ln, pad, startY + i * lh));
+    // byline
+    try { ctx.letterSpacing = "5px"; } catch (e) {}
+    ctx.font = '700 30px "Space Grotesk", sans-serif';
+    ctx.fillStyle = photo ? "rgba(255,255,255,.82)" : hexA(b.fg, 0.7);
+    ctx.textAlign = "right";
+    ctx.fillText("FUTURE", W - pad, startY + (lines.length - 1) * lh + 62);
+    try { ctx.letterSpacing = "0px"; } catch (e) {}
+    return await new Promise((res) => c.toBlob(res, "image/png", 0.95));
+  }
+
+  let lastBlob = null;
+  async function openShareModal() {
     if (!current) return;
-    const payload = '"' + current.text + '"\n\n— Future said it';
-    if (navigator.share) { try { await navigator.share({ text: payload, url: location.href }); return; } catch (e) {} }
-    $("#shareQuote").textContent = current.text;
     $("#modal").hidden = false;
+    $("#shareImg").removeAttribute("src");
+    try { lastBlob = await composeImage(); $("#shareImg").src = URL.createObjectURL(lastBlob); }
+    catch (e) { toast("Couldn't build image"); }
+  }
+  async function saveImage() {
+    try {
+      const blob = lastBlob || await composeImage();
+      const file = new File([blob], "future.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); return; }
+        catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "future.png";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      toast("Image saved");
+    } catch (e) { toast("Couldn't save"); }
   }
   async function copyText() {
-    try { await navigator.clipboard.writeText('"' + current.text + '"\n\n— Future said it\n' + location.href); toast("Copied"); }
+    try { await navigator.clipboard.writeText('"' + current.text + '"\n\n— Future\n' + location.href); toast("Copied"); }
     catch (e) { toast("Couldn't copy"); }
   }
 
@@ -85,14 +142,11 @@
   function closeMenu() { $("#menu").hidden = true; }
   function showPanel(name) {
     panels.forEach((p) => { $("#panel-" + p).hidden = p !== name; });
-    document.querySelectorAll(".menu-link").forEach((l) => l.style.color = l.dataset.panel === name ? "var(--accent, #C5E063)" : "");
     if (name === "saved") renderSaved();
     if (name === "backgrounds") renderBackgrounds();
   }
-
   function renderSaved() {
-    const list = $("#savedList"), empty = $("#savedEmpty");
-    list.innerHTML = "";
+    const list = $("#savedList"), empty = $("#savedEmpty"); list.innerHTML = "";
     empty.hidden = state.saved.length > 0;
     state.saved.forEach((s) => {
       const el = document.createElement("div"); el.className = "saved-item";
@@ -102,33 +156,29 @@
       el.appendChild(q); el.appendChild(rm); list.appendChild(el);
     });
   }
-
   function renderBackgrounds() {
     const grid = $("#bgGrid"); grid.innerHTML = "";
     BACKGROUNDS.forEach((b) => {
       const btn = document.createElement("button");
       btn.className = "bg-swatch" + (b.id === state.bgId ? " is-current" : "");
-      btn.style.background = b.bg;
-      btn.textContent = b.name;
-      if (b.image) { const t = new Image(); t.onload = () => { btn.style.backgroundImage = "url(" + b.image + ")"; }; t.src = b.image; }
+      btn.style.background = b.bg; btn.textContent = b.name;
+      if (b.image) loadImg(b.image).then(() => { btn.style.backgroundImage = "url(" + b.image + ")"; }).catch(() => {});
       btn.addEventListener("click", () => { state.bgId = b.id; persist(); applyBackground(b.id); renderBackgrounds(); toast(b.name); });
       grid.appendChild(btn);
     });
   }
-
   function submitAdd() {
     const t = $("#addText").value.trim();
     if (!t) { $("#addNote").textContent = "Type a line first."; return; }
     state.custom.push({ text: t }); persist();
     $("#addText").value = ""; $("#addNote").textContent = "Added. It will show up in the deck.";
-    reshuffle();
-    setTimeout(() => { $("#addNote").textContent = ""; }, 2500);
+    reshuffle(); setTimeout(() => { $("#addNote").textContent = ""; }, 2500);
   }
 
-  /* ---------- swipe / tap to advance ---------- */
+  /* ---------- swipe + tap (single = next, double = change background) ---------- */
   function attachSwipe() {
     const deck = $("#deck");
-    let sx = 0, sy = 0, dx = 0, on = false, moved = false;
+    let sx = 0, sy = 0, dx = 0, on = false, moved = false, lastTap = 0, tapTimer = null;
     const card = () => $("#quoteWrap");
     const down = (x, y) => { sx = x; sy = y; dx = 0; on = true; moved = false; };
     const move = (x, y) => {
@@ -155,7 +205,12 @@
     deck.addEventListener("mousedown", (e) => { md = true; down(e.clientX, e.clientY); });
     window.addEventListener("mousemove", (e) => { if (md) move(e.clientX, e.clientY); });
     window.addEventListener("mouseup", () => { if (!md) return; md = false; if (moved) up(); else on = false; });
-    deck.addEventListener("click", () => { if (!moved) next(); });
+    deck.addEventListener("click", () => {
+      if (moved) return;
+      const now = Date.now();
+      if (now - lastTap < 300) { clearTimeout(tapTimer); lastTap = 0; cycleBackground(); }
+      else { lastTap = now; tapTimer = setTimeout(() => { next(); }, 300); }
+    });
   }
 
   /* ---------- toast ---------- */
@@ -171,7 +226,7 @@
       if (last === today) return;
       if (!("Notification" in window) || Notification.permission !== "granted") return;
       const a = allQuotes(); const q = a[(Math.random() * a.length) | 0];
-      new Notification("Future said it", { body: q.text, icon: "icons/icon-192.png" });
+      new Notification("Future", { body: q.text, icon: "icons/icon-192.png" });
       localStorage.setItem("future.lastNudge", today);
     };
     fire(); ni = setInterval(fire, 36e5);
@@ -191,14 +246,12 @@
 
   /* ---------- init ---------- */
   function init() {
-    applyBackground(state.bgId);
-    applyMotion();
-    reshuffle(); next();
-    attachSwipe();
+    applyBackground(state.bgId); applyMotion();
+    reshuffle(); next(); attachSwipe();
 
     $("#saveBtn").addEventListener("click", toggleSave);
-    $("#shareBtn").addEventListener("click", share);
-    $("#menuBtn").addEventListener("click", () => { openMenu(); });
+    $("#shareBtn").addEventListener("click", openShareModal);
+    $("#menuBtn").addEventListener("click", openMenu);
 
     document.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeMenu));
     document.querySelectorAll(".menu-link").forEach((l) => l.addEventListener("click", () => showPanel(l.dataset.panel)));
@@ -208,15 +261,17 @@
     $("#motionToggle").addEventListener("click", () => { state.reduceMotion = !state.reduceMotion; persist(); applyMotion(); });
     $("#installBtn").addEventListener("click", install);
 
+    $("#saveImgBtn").addEventListener("click", saveImage);
+    $("#copyBtn").addEventListener("click", copyText);
     $("#modalClose").addEventListener("click", () => $("#modal").hidden = true);
     document.querySelector("[data-close-modal]").addEventListener("click", () => $("#modal").hidden = true);
-    $("#copyBtn").addEventListener("click", copyText);
 
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") { $("#modal").hidden = true; closeMenu(); return; }
       if ($("#menu").hidden && $("#modal").hidden) {
         if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next(); }
         if (e.key.toLowerCase() === "s") toggleSave();
+        if (e.key.toLowerCase() === "b") cycleBackground();
       }
     });
 

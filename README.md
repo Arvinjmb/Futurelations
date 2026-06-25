@@ -1,22 +1,25 @@
 # Future said it
 
-A pocket quote deck for the web. One line at a time — flick through, save the ones that hit, switch between themed collections that reskin the whole app, and add your own. Installable to a phone home screen and works offline.
+A pocket quote deck for the web. One line at a time, set over full-screen photos. Flick through, save the ones that hit, switch backgrounds with a double-tap, and save a quote-on-photo straight to your gallery. Installable to a phone home screen and works offline.
 
-Every line is signed **Future said it**. The content is fully swappable, so this is really a reusable quote-app engine seeded with original demo lines you replace in one file.
+Every line is signed **Future**. The content is fully swappable — it ships with original placeholder lines you replace in one file (`quotes.js`).
 
 ---
 
 ## What it does
 
-- **Deck** — one quote per card. Tap the card, press → / space, or swipe for the next.
-- **Three buttons, nothing more** — Save, Share, Next. Everything else (Saved, Collections, Add, Settings) lives behind the single menu in the top-right.
+- **Deck** — the quote sits straight on a full-screen photo. Tap, press → / space, or swipe for the next.
+- **Double-tap to change background** — cycles through the four backgrounds. (Keyboard: `b`.)
+- **Three icons, nothing else** — menu, save (heart), share/save-image.
+- **Save image to gallery** — bakes the current quote + the **FUTURE** signature onto the photo and saves it (native share-sheet → Save Image on mobile, download elsewhere).
 - **Save** — heart a line to keep it in your library.
-- **Share** — native share sheet on mobile, with a copy-text + share-card fallback everywhere else.
-- **Collections** — themed sets (Momentum, Stillness, Build, Late Night). Each is a full duotone skin that washes the whole app when selected.
+- **Backgrounds** — four photo slots (`images/bg-1.jpg` … `bg-4.jpg`). Replace the files to use your own; each falls back to a solid colour if a file is missing.
 - **Add** — write your own lines; they live on the device and appear in the deck.
 - **Daily line** — opt-in once-a-day notification (works while open / installed — see limits below).
 - **Install + offline** — add to home screen as a PWA; the service worker caches everything.
 - **Accessible** — keyboard controls, visible focus, respects reduced-motion.
+
+> The four photos in `images/` are user-supplied. Make sure you have the right to use any image you host publicly. The seeded lines are original placeholders in the app's voice — they are **not** real quotes by any person. Add the lines you want on the **Add** screen or in `quotes.js`.
 
 ---
 
