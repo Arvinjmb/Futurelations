@@ -1,13 +1,13 @@
 {
-  "name": "Future said it",
-  "short_name": "Future",
-  "description": "A pocket quote deck. One line at a time — Future said it.",
+  "name": "Futurelations",
+  "short_name": "Futurelations",
+  "description": "One line at a time, over the photos. Futurelations.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#23241A",
-  "theme_color": "#23241A",
+  "background_color": "#242525",
+  "theme_color": "#242525",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

@@ -174,6 +174,12 @@
     $("#addText").value = ""; $("#addNote").textContent = "Added. It will show up in the deck.";
     reshuffle(); setTimeout(() => { $("#addNote").textContent = ""; }, 2500);
   }
+  async function exportLines() {
+    if (!state.custom.length) { toast("No added lines yet"); return; }
+    const body = state.custom.map((q) => "  " + JSON.stringify(q.text) + ",").join("\n");
+    try { await navigator.clipboard.writeText(body); toast("Copied " + state.custom.length + " line" + (state.custom.length > 1 ? "s" : "")); }
+    catch (e) { toast("Couldn't copy"); }
+  }
 
   /* ---------- swipe + tap (single = next, double = change background) ---------- */
   function attachSwipe() {
@@ -226,7 +232,7 @@
       if (last === today) return;
       if (!("Notification" in window) || Notification.permission !== "granted") return;
       const a = allQuotes(); const q = a[(Math.random() * a.length) | 0];
-      new Notification("Future", { body: q.text, icon: "icons/icon-192.png" });
+      new Notification("Futurelations", { body: q.text, icon: "icons/icon-192.png" });
       localStorage.setItem("future.lastNudge", today);
     };
     fire(); ni = setInterval(fire, 36e5);
@@ -257,6 +263,7 @@
     document.querySelectorAll(".menu-link").forEach((l) => l.addEventListener("click", () => showPanel(l.dataset.panel)));
 
     $("#addSubmit").addEventListener("click", submitAdd);
+    $("#exportBtn").addEventListener("click", exportLines);
     $("#notifyToggle").addEventListener("click", toggleNotify);
     $("#motionToggle").addEventListener("click", () => { state.reduceMotion = !state.reduceMotion; persist(); applyMotion(); });
     $("#installBtn").addEventListener("click", install);

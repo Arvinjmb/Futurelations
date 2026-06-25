@@ -1,5 +1,5 @@
 /* SAID service worker — cache-first for offline use. Bump VERSION to ship updates. */
-const VERSION = "future-v3";
+const VERSION = "future-v4";
 const ASSETS = [
   "./",
   "./index.html",

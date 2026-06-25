@@ -1,4 +1,4 @@
-# Future said it
+# Futurelations
 
 A pocket quote deck for the web. One line at a time, set over full-screen photos. Flick through, save the ones that hit, switch backgrounds with a double-tap, and save a quote-on-photo straight to your gallery. Installable to a phone home screen and works offline.
 
