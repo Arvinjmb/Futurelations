@@ -23,18 +23,17 @@
   function applyBackground(id) {
     const b = bgById(id);
     const root = document.documentElement.style;
-    const stage = $("#stage");
     root.setProperty("--bg", b.bg);
     root.setProperty("--fg", b.fg);
     root.setProperty("--accent", b.accent);
+    root.setProperty("--bg-image", "none");
+    root.setProperty("--scrim", "0");
     document.querySelector('meta[name="theme-color"]').setAttribute("content", b.bg);
-    stage.style.backgroundImage = "none";
-    stage.classList.remove("has-photo");
     if (b.image) {
-      loadImg(b.image).then((img) => {
+      loadImg(b.image).then(() => {
         if (state.bgId !== id) return;
-        stage.style.backgroundImage = "url(" + b.image + ")";
-        stage.classList.add("has-photo");
+        root.setProperty("--bg-image", 'url("' + b.image + '")');
+        root.setProperty("--scrim", "1");
         root.setProperty("--fg", "#ffffff");
       }).catch(() => {});
     }

@@ -2,9 +2,11 @@
    FUTURE — clean, card-less. Text straight on a full-bleed background.
    ========================================================================= */
 :root {
-  --bg: #DE8150;
-  --fg: #1B1206;
-  --accent: #1B1206;
+  --bg: #242525;
+  --fg: #FFFFFF;
+  --accent: #FFFFFF;
+  --bg-image: none;
+  --scrim: 0;
   --ease: cubic-bezier(.22,.61,.36,1);
   --pad: clamp(22px, 7vw, 40px);
 }
@@ -22,28 +24,34 @@ body {
   overscroll-behavior: none;
 }
 
+#bg {
+  position: fixed; inset: 0; z-index: 0;
+  background-color: var(--bg);
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  transition: background-color .55s var(--ease);
+}
+#bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.6));
+  opacity: var(--scrim);
+  transition: opacity .4s var(--ease);
+  pointer-events: none;
+}
+
 .stage {
   position: relative;
+  z-index: 1;
   max-width: 620px;
   margin: 0 auto;
   min-height: 100vh;          /* fallback for older browsers */
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-size: cover;
-  background-position: center;
-  transition: background-color .55s var(--ease);
   padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom));
   -webkit-touch-callout: none;
 }
-/* scrim only when a photo background is active, so text stays readable */
-.stage.has-photo::before {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55));
-  pointer-events: none;
-}
-.stage > * { position: relative; z-index: 1; }
 
 /* ---------- the quote ---------- */
 .deck {
