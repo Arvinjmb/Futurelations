@@ -13,13 +13,12 @@ Every line is signed **Future**. The content is fully swappable — it ships wit
 - **Three icons, nothing else** — menu, save (heart), share/save-image.
 - **Save image to gallery** — bakes the current quote + the **FUTURE** signature onto the photo and saves it (native share-sheet → Save Image on mobile, download elsewhere).
 - **Save** — heart a line to keep it in your library.
-- **Backgrounds** — four photo slots (`images/bg-1.jpg` … `bg-4.jpg`). Replace the files to use your own; each falls back to a solid colour if a file is missing.
-- **Add** — write your own lines; they live on the device and appear in the deck.
+- **Backgrounds** — four full-screen photos, **embedded in `assets.js`** so they always load (no separate image files to upload). Switch in the menu or by double-tapping.
 - **Daily line** — opt-in once-a-day notification (works while open / installed — see limits below).
 - **Install + offline** — add to home screen as a PWA; the service worker caches everything.
 - **Accessible** — keyboard controls, visible focus, respects reduced-motion.
 
-> The four photos in `images/` are user-supplied. Make sure you have the right to use any image you host publicly. The seeded lines are original placeholders in the app's voice — they are **not** real quotes by any person. Add the lines you want on the **Add** screen or in `quotes.js`.
+> The four photos are user-supplied and embedded in `assets.js`. To change them, replace the data in `assets.js` (or point `BACKGROUNDS[i].image` in `quotes.js` at your own file). The seeded lines are original placeholders — edit the `QUOTES` list in `quotes.js` to set the wording you want.
 
 ---
 
@@ -90,7 +89,8 @@ Add, remove, or rename collections freely. Set `DEFAULT_COLLECTION` to whichever
 | `index.html` | App structure and all views |
 | `styles.css` | Visual identity + the per-collection skin system |
 | `app.js` | Deck engine, save/share, menu, collections, add, settings, PWA |
-| `quotes.js` | **The content. Edit this.** |
+| `quotes.js` | **The lines. Edit this.** |
+| `assets.js` | The four embedded background photos |
 | `manifest.json` | Makes the app installable |
 | `sw.js` | Service worker for offline use |
 | `icons/` | App icons |

@@ -59,11 +59,12 @@ const QUOTES = [
   "Tomorrow gets the best version of me, and so does today."
 ];
 
+const _IMG = (typeof window !== "undefined" && window.SAID_BG_IMAGES) || {};
 const BACKGROUNDS = [
-  { id: "bg1", name: "Mirror", bg: "#242525", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-1.jpg" },
-  { id: "bg2", name: "Eagle",  bg: "#1F1818", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-2.jpg" },
-  { id: "bg3", name: "Hood",   bg: "#312D21", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-3.jpg" },
-  { id: "bg4", name: "Chef",   bg: "#424242", fg: "#FFFFFF", accent: "#FFFFFF", image: "images/bg-4.jpg" }
+  { id: "bg1", name: "Mirror", bg: "#242525", fg: "#FFFFFF", accent: "#FFFFFF", image: _IMG.bg1 || "images/bg-1.jpg" },
+  { id: "bg2", name: "Eagle",  bg: "#1F1818", fg: "#FFFFFF", accent: "#FFFFFF", image: _IMG.bg2 || "images/bg-2.jpg" },
+  { id: "bg3", name: "Hood",   bg: "#312D21", fg: "#FFFFFF", accent: "#FFFFFF", image: _IMG.bg3 || "images/bg-3.jpg" },
+  { id: "bg4", name: "Chef",   bg: "#424242", fg: "#FFFFFF", accent: "#FFFFFF", image: _IMG.bg4 || "images/bg-4.jpg" }
 ];
 
 const DEFAULT_BG = "bg1";

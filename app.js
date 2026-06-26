@@ -137,7 +137,7 @@
   }
 
   /* ---------- menu + panels ---------- */
-  const panels = ["saved", "backgrounds", "add", "settings"];
+  const panels = ["saved", "backgrounds", "settings"];
   function openMenu() { $("#menu").hidden = false; }
   function closeMenu() { $("#menu").hidden = true; }
   function showPanel(name) {
@@ -262,8 +262,6 @@
     document.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeMenu));
     document.querySelectorAll(".menu-link").forEach((l) => l.addEventListener("click", () => showPanel(l.dataset.panel)));
 
-    $("#addSubmit").addEventListener("click", submitAdd);
-    $("#exportBtn").addEventListener("click", exportLines);
     $("#notifyToggle").addEventListener("click", toggleNotify);
     $("#motionToggle").addEventListener("click", () => { state.reduceMotion = !state.reduceMotion; persist(); applyMotion(); });
     $("#installBtn").addEventListener("click", install);
