@@ -71,6 +71,11 @@ body {
   padding: 0 var(--pad);
   cursor: grab;
 }
+.deck.pos-top { align-items: flex-start; }
+.deck.pos-top .quote-wrap { margin-top: 11vh; }
+.deck.pos-center { align-items: center; }
+.deck.pos-bottom { align-items: flex-end; }
+.deck.pos-bottom .quote-wrap { margin-bottom: 7vh; }
 .deck:active { cursor: grabbing; }
 .quote-wrap { width: 100%; will-change: transform; }
 
@@ -193,6 +198,10 @@ body {
 .credit-label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #9a988e; margin: 18px 0 6px; }
 .credit-text { font-size: 14.5px; line-height: 1.5; color: #EDEAE0; }
 .credit-lock { margin-top: 22px; font-size: 12.5px; line-height: 1.6; color: #9a988e; border-top: 1px solid rgba(255,255,255,.1); padding-top: 16px; }
+.add-count { font-size: 13px; color: #C5E063; margin-top: 4px; min-height: 16px; }
+.add-publish { margin-top: 20px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 16px; }
+.add-publish .panel__hint { margin-bottom: 12px; }
+.add-publish strong { color: #EDEAE0; }
 
 /* background picker */
 .bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
