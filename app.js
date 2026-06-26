@@ -161,7 +161,7 @@
   }
 
   /* ---------- menu + panels ---------- */
-  const panels = ["saved", "backgrounds", "credits", "settings"];
+  const panels = ["saved", "backgrounds", "add", "credits", "settings"];
   function openMenu() { $("#menu").hidden = false; }
   function closeMenu() { $("#menu").hidden = true; }
   function showPanel(name) {
@@ -312,6 +312,8 @@
     document.querySelectorAll(".menu-link").forEach((l) => l.addEventListener("click", () => showPanel(l.dataset.panel)));
 
     $("#notifyToggle").addEventListener("click", toggleNotify);
+    $("#addSubmit").addEventListener("click", submitAdd);
+    $("#exportBtn").addEventListener("click", exportLines);
     $("#motionToggle").addEventListener("click", () => { state.reduceMotion = !state.reduceMotion; persist(); applyMotion(); });
     $("#installBtn").addEventListener("click", install);
 
