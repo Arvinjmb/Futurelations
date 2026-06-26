@@ -122,8 +122,10 @@ body {
 .bar__btn:hover { background: color-mix(in srgb, var(--fg) 10%, transparent); }
 .bar__btn:active { transform: scale(.9); }
 .bar__btn svg { width: 26px; height: 26px; }
-.bar__btn--heart svg { fill: none; stroke: currentColor; stroke-width: 1.7px; }
-.bar__btn--heart[aria-pressed="true"] svg { fill: var(--fg); }
+.bar__btn--cup svg { fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linecap: round; stroke-linejoin: round; }
+.cup-liquid { stroke: none; fill: transparent; transition: fill .22s var(--ease); }
+.bar__btn--cup[aria-pressed="true"] .cup-liquid { fill: #8B5CF6; }
+.bar__btn--cup[aria-pressed="true"] svg { stroke: #8B5CF6; }
 .bar__btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
 .sitemark {
