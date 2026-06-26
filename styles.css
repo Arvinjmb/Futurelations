@@ -27,16 +27,22 @@ body {
 #bg {
   position: fixed; inset: 0; z-index: 0;
   background-color: var(--bg);
-  background-image: var(--bg-image);
+  transition: background-color .6s var(--ease);
+}
+.bg-layer {
+  position: absolute; inset: 0;
   background-size: cover;
   background-position: center;
-  transition: background-color .55s var(--ease);
+  opacity: 0;
+  transition: opacity .65s var(--ease);
+  will-change: opacity;
 }
-#bg::after {
-  content: ""; position: absolute; inset: 0;
+.bg-layer.is-active { opacity: 1; }
+.bg-scrim {
+  position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.6));
   opacity: var(--scrim);
-  transition: opacity .4s var(--ease);
+  transition: opacity .5s var(--ease);
   pointer-events: none;
 }
 

@@ -20,22 +20,35 @@
   const hexA = (h, a) => { const n = parseInt(h.slice(1), 16); return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")"; };
 
   /* ---------- background ---------- */
+  let bgActive = null;
+  function setPhoto(src) {
+    const a = document.getElementById("bgA"), b = document.getElementById("bgB");
+    const cur = bgActive || a;
+    const nxt = cur === a ? b : a;
+    nxt.style.backgroundImage = 'url("' + src + '")';
+    void nxt.offsetWidth;                 // reflow so the fade always runs
+    nxt.classList.add("is-active");
+    cur.classList.remove("is-active");
+    bgActive = nxt;
+  }
   function applyBackground(id) {
     const b = bgById(id);
     const root = document.documentElement.style;
     root.setProperty("--bg", b.bg);
     root.setProperty("--fg", b.fg);
     root.setProperty("--accent", b.accent);
-    root.setProperty("--bg-image", "none");
-    root.setProperty("--scrim", "0");
     document.querySelector('meta[name="theme-color"]').setAttribute("content", b.bg);
     if (b.image) {
       loadImg(b.image).then(() => {
         if (state.bgId !== id) return;
-        root.setProperty("--bg-image", 'url("' + b.image + '")');
+        setPhoto(b.image);
         root.setProperty("--scrim", "1");
         root.setProperty("--fg", "#ffffff");
       }).catch(() => {});
+    } else {
+      const a = document.getElementById("bgA"), bb = document.getElementById("bgB");
+      a.classList.remove("is-active"); bb.classList.remove("is-active"); bgActive = null;
+      root.setProperty("--scrim", "0");
     }
   }
   function cycleBackground() {
