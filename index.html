@@ -34,7 +34,7 @@
     </main>
 
     <!-- three icons, nothing else -->
-    <p class="hint" id="hint">Swipe for the next line · double-tap to change the photo</p>
+    <p class="hint" id="hint">Swipe down for the next line, up for the last · double-tap to change the photo</p>
     <footer class="bar">
       <button class="bar__btn" id="menuBtn" aria-label="Menu">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.4" fill="currentColor"/><circle cx="4.5" cy="12" r="1.4" fill="currentColor"/><circle cx="4.5" cy="18" r="1.4" fill="currentColor"/></svg>
@@ -58,11 +58,13 @@
 
       <button class="menu-link" data-panel="saved">Saved</button>
       <button class="menu-link" data-panel="backgrounds">Backgrounds</button>
+      <button class="menu-link" data-panel="credits">Credits</button>
       <button class="menu-link" data-panel="settings">Settings</button>
 
       <!-- Saved panel -->
       <section class="panel" id="panel-saved" hidden>
         <h2 class="panel__title">Saved</h2>
+        <p class="panel__hint" id="savedHint" hidden>Tap a line to bring it to the screen.</p>
         <div class="saved-list" id="savedList"></div>
         <p class="panel__empty" id="savedEmpty" hidden>Tap the heart on a line to keep it here.</p>
       </section>
@@ -72,6 +74,19 @@
         <h2 class="panel__title">Backgrounds</h2>
         <p class="panel__hint">Drop your own photos at <code>images/bg-1.jpg</code> … <code>bg-4.jpg</code> to replace these.</p>
         <div class="bg-grid" id="bgGrid"></div>
+      </section>
+
+      <!-- Credits panel -->
+      <section class="panel" id="panel-credits" hidden>
+        <h2 class="panel__title">Credits</h2>
+
+        <p class="credit-label">Photography</p>
+        <p class="credit-text">All photographs of Future remain the property of their original owners and photographers. All rights reserved to them.</p>
+
+        <p class="credit-label">Created by</p>
+        <p class="credit-text">Concept, design &amp; build — Arvin.</p>
+
+        <p class="credit-lock">Futurelations © 2026 Arvin. All rights reserved.<br>This creation belongs to Arvin.</p>
       </section>
 
       <!-- Settings panel -->

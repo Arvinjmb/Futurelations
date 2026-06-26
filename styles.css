@@ -172,16 +172,25 @@ body {
 .panel__empty { font-size: 14px; color: #9a988e; }
 
 .saved-list { display: flex; flex-direction: column; gap: 10px; }
+.saved-list { display: flex; flex-direction: column; gap: 10px; }
 .saved-item {
   background: rgba(255,255,255,.05);
   border-radius: 14px; padding: 16px;
+  cursor: pointer;
+  transition: background .15s;
 }
+.saved-item:hover { background: rgba(255,255,255,.09); }
+.saved-item:active { background: rgba(255,255,255,.13); }
 .saved-item__q { font-size: 15px; line-height: 1.4; }
 .saved-item__rm {
   margin-top: 10px; background: none; border: 0; cursor: pointer;
   color: #9a988e; font-family: inherit; font-size: 12.5px; padding: 0;
 }
 .saved-item__rm:hover { color: #e07a5f; }
+
+.credit-label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #9a988e; margin: 18px 0 6px; }
+.credit-text { font-size: 14.5px; line-height: 1.5; color: #EDEAE0; }
+.credit-lock { margin-top: 22px; font-size: 12.5px; line-height: 1.6; color: #9a988e; border-top: 1px solid rgba(255,255,255,.1); padding-top: 16px; }
 
 /* background picker */
 .bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }

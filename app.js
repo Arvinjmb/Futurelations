@@ -57,10 +57,22 @@
     state.bgId = nb.id; persist(); applyBackground(nb.id);
   }
 
-  /* ---------- deck ---------- */
-  let pool = [], current = null;
+  /* ---------- deck (with history so you can go back) ---------- */
+  let pool = [], history = [], hIndex = -1, current = null;
   function reshuffle() { pool = allQuotes().slice(); for (let i = pool.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [pool[i], pool[j]] = [pool[j], pool[i]]; } }
-  function next() { if (!pool.length) reshuffle(); current = pool.pop(); render(); }
+  function drawNew() { if (!pool.length) reshuffle(); return pool.pop(); }
+  function next() {
+    if (hIndex < history.length - 1) hIndex++;
+    else { history.push(drawNew()); hIndex = history.length - 1; }
+    current = history[hIndex]; render();
+  }
+  function prev() {
+    if (hIndex <= 0) return false;
+    hIndex--; current = history[hIndex]; render(); return true;
+  }
+  function showQuote(q) {
+    history.push({ text: q.text }); hIndex = history.length - 1; current = history[hIndex]; render();
+  }
   function render() {
     $("#quoteText").textContent = current.text;
     $("#saveBtn").setAttribute("aria-pressed", String(state.saved.some((s) => s.id === idOf(current.text))));
@@ -149,7 +161,7 @@
   }
 
   /* ---------- menu + panels ---------- */
-  const panels = ["saved", "backgrounds", "settings"];
+  const panels = ["saved", "backgrounds", "credits", "settings"];
   function openMenu() { $("#menu").hidden = false; }
   function closeMenu() { $("#menu").hidden = true; }
   function showPanel(name) {
@@ -158,13 +170,17 @@
     if (name === "backgrounds") renderBackgrounds();
   }
   function renderSaved() {
-    const list = $("#savedList"), empty = $("#savedEmpty"); list.innerHTML = "";
+    const list = $("#savedList"), empty = $("#savedEmpty"), hint = $("#savedHint"); list.innerHTML = "";
     empty.hidden = state.saved.length > 0;
+    if (hint) hint.hidden = state.saved.length === 0;
     state.saved.forEach((s) => {
-      const el = document.createElement("div"); el.className = "saved-item";
+      const el = document.createElement("div"); el.className = "saved-item"; el.setAttribute("role", "button"); el.tabIndex = 0;
       const q = document.createElement("p"); q.className = "saved-item__q"; q.textContent = s.text;
       const rm = document.createElement("button"); rm.className = "saved-item__rm"; rm.textContent = "Remove";
-      rm.addEventListener("click", () => { const i = state.saved.findIndex((x) => x.id === s.id); if (i >= 0) state.saved.splice(i, 1); persist(); renderSaved(); render(); });
+      rm.addEventListener("click", (ev) => { ev.stopPropagation(); const i = state.saved.findIndex((x) => x.id === s.id); if (i >= 0) state.saved.splice(i, 1); persist(); renderSaved(); render(); });
+      const open = () => { showQuote(s); closeMenu(); };
+      el.addEventListener("click", open);
+      el.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); open(); } });
       el.appendChild(q); el.appendChild(rm); list.appendChild(el);
     });
   }
@@ -222,15 +238,18 @@
       if (!active || (e && e.pointerId !== pid)) return;
       active = false;
       const dist = Math.hypot(dx, dy);
-      hideHint();
       if (moved && dist > THRESH) {
-        const k = 720 / (dist || 1), c = card();
+        hideHint();
+        const horizontal = Math.abs(dx) > Math.abs(dy);
+        const goPrev = !horizontal && dy < 0;       // swipe up = previous
+        if (goPrev && hIndex <= 0) { reset(); return; }  // nothing before → snap back
+        const k = 760 / (dist || 1), c = card();
         if (!state.reduceMotion) {
           c.style.transition = "transform .26s var(--ease), opacity .26s var(--ease)";
           c.style.transform = "translate(" + dx * k + "px," + dy * k + "px)";
           c.style.opacity = "0";
         }
-        setTimeout(() => { reset(); next(); }, state.reduceMotion ? 0 : 230);
+        setTimeout(() => { reset(); if (goPrev) prev(); else next(); }, state.reduceMotion ? 0 : 230);
       } else if (!moved) {
         // a stationary tap: double-tap cycles the background, single tap does nothing
         const now = Date.now();
@@ -304,7 +323,8 @@
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") { $("#modal").hidden = true; closeMenu(); return; }
       if ($("#menu").hidden && $("#modal").hidden) {
-        if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " " || e.key === "Enter") { e.preventDefault(); hideHint(); next(); }
+        if (e.key === "ArrowDown" || e.key === "ArrowRight" || e.key === " " || e.key === "Enter") { e.preventDefault(); hideHint(); next(); }
+        if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); hideHint(); prev(); }
         if (e.key.toLowerCase() === "s") toggleSave();
         if (e.key.toLowerCase() === "b") { hideHint(); cycleBackground(); }
       }
