@@ -181,43 +181,61 @@
     catch (e) { toast("Couldn't copy"); }
   }
 
-  /* ---------- swipe + tap (single = next, double = change background) ---------- */
-  function attachSwipe() {
+  /* ---------- gestures: swipe = next, double-tap = background (Pointer Events, all OSes) ---------- */
+  function attachGestures() {
     const deck = $("#deck");
-    let sx = 0, sy = 0, dx = 0, on = false, moved = false, lastTap = 0, tapTimer = null;
     const card = () => $("#quoteWrap");
-    const down = (x, y) => { sx = x; sy = y; dx = 0; on = true; moved = false; };
-    const move = (x, y) => {
-      if (!on) return; dx = x - sx; const dy = y - sy;
-      if (Math.abs(dx) < Math.abs(dy)) return;
-      if (!moved && Math.abs(dx) > 4) { moved = true; card().style.transition = "none"; }
-      if (!moved) return;
-      card().style.transform = "translateX(" + dx + "px)";
-      card().style.opacity = String(1 - Math.min(Math.abs(dx) / 360, .5));
-    };
+    const THRESH = 64;          // min flick distance to advance
+    let sx = 0, sy = 0, dx = 0, dy = 0, active = false, moved = false, pid = null, lastTap = 0;
+
     const reset = () => { const c = card(); c.style.transition = ""; c.style.transform = ""; c.style.opacity = ""; };
-    const up = () => {
-      if (!on) return; on = false;
-      if (Math.abs(dx) > 80) {
-        const dir = dx > 0 ? 1 : -1; const c = card();
-        if (!state.reduceMotion) { c.style.transition = ""; c.style.transform = "translateX(" + dir * 500 + "px)"; c.style.opacity = "0"; }
-        setTimeout(() => { reset(); next(); }, state.reduceMotion ? 0 : 260);
+
+    const start = (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      active = true; moved = false; pid = e.pointerId;
+      sx = e.clientX; sy = e.clientY; dx = 0; dy = 0;
+      try { deck.setPointerCapture(e.pointerId); } catch (_) {}
+      card().style.transition = "none";
+    };
+    const move = (e) => {
+      if (!active || e.pointerId !== pid) return;
+      dx = e.clientX - sx; dy = e.clientY - sy;
+      if (!moved && Math.hypot(dx, dy) > 6) moved = true;
+      if (moved) {
+        card().style.transform = "translate(" + dx * 0.7 + "px," + dy * 0.7 + "px)";
+        card().style.opacity = String(1 - Math.min(Math.hypot(dx, dy) / 320, 0.55));
+      }
+    };
+    const end = (e) => {
+      if (!active || (e && e.pointerId !== pid)) return;
+      active = false;
+      const dist = Math.hypot(dx, dy);
+      hideHint();
+      if (moved && dist > THRESH) {
+        const k = 720 / (dist || 1), c = card();
+        if (!state.reduceMotion) {
+          c.style.transition = "transform .26s var(--ease), opacity .26s var(--ease)";
+          c.style.transform = "translate(" + dx * k + "px," + dy * k + "px)";
+          c.style.opacity = "0";
+        }
+        setTimeout(() => { reset(); next(); }, state.reduceMotion ? 0 : 230);
+      } else if (!moved) {
+        // a stationary tap: double-tap cycles the background, single tap does nothing
+        const now = Date.now();
+        reset();
+        if (now - lastTap < 300) { lastTap = 0; cycleBackground(); }
+        else lastTap = now;
       } else reset();
     };
-    deck.addEventListener("touchstart", (e) => down(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-    deck.addEventListener("touchmove", (e) => move(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-    deck.addEventListener("touchend", up);
-    let md = false;
-    deck.addEventListener("mousedown", (e) => { md = true; down(e.clientX, e.clientY); });
-    window.addEventListener("mousemove", (e) => { if (md) move(e.clientX, e.clientY); });
-    window.addEventListener("mouseup", () => { if (!md) return; md = false; if (moved) up(); else on = false; });
-    deck.addEventListener("click", () => {
-      if (moved) return;
-      const now = Date.now();
-      if (now - lastTap < 300) { clearTimeout(tapTimer); lastTap = 0; cycleBackground(); }
-      else { lastTap = now; tapTimer = setTimeout(() => { next(); }, 300); }
-    });
+
+    deck.addEventListener("pointerdown", start);
+    deck.addEventListener("pointermove", move);
+    deck.addEventListener("pointerup", end);
+    deck.addEventListener("pointercancel", end);
+    deck.addEventListener("pointerleave", (e) => { if (active) end(e); });
   }
+
+  function hideHint() { const h = $("#hint"); if (h) h.classList.add("is-gone"); }
 
   /* ---------- toast ---------- */
   let tt; function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("is-shown"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("is-shown"), 1500); }
@@ -253,7 +271,7 @@
   /* ---------- init ---------- */
   function init() {
     applyBackground(state.bgId); applyMotion();
-    reshuffle(); next(); attachSwipe();
+    reshuffle(); next(); attachGestures();
 
     $("#saveBtn").addEventListener("click", toggleSave);
     $("#shareBtn").addEventListener("click", openShareModal);
@@ -274,11 +292,13 @@
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") { $("#modal").hidden = true; closeMenu(); return; }
       if ($("#menu").hidden && $("#modal").hidden) {
-        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next(); }
+        if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " " || e.key === "Enter") { e.preventDefault(); hideHint(); next(); }
         if (e.key.toLowerCase() === "s") toggleSave();
-        if (e.key.toLowerCase() === "b") cycleBackground();
+        if (e.key.toLowerCase() === "b") { hideHint(); cycleBackground(); }
       }
     });
+
+    setTimeout(hideHint, 5000);   // hint fades on its own if unused
 
     if (state.notify && "Notification" in window && Notification.permission === "granted") { $("#notifyToggle").setAttribute("aria-checked", "true"); startNudge(); }
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

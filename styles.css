@@ -11,10 +11,13 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--fg);
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   transition: background-color .55s var(--ease), color .55s var(--ease);
   overscroll-behavior: none;
 }
@@ -23,6 +26,7 @@ body {
   position: relative;
   max-width: 620px;
   margin: 0 auto;
+  min-height: 100vh;          /* fallback for older browsers */
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -30,6 +34,7 @@ body {
   background-position: center;
   transition: background-color .55s var(--ease);
   padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom));
+  -webkit-touch-callout: none;
 }
 /* scrim only when a photo background is active, so text stays readable */
 .stage.has-photo::before {
@@ -43,14 +48,29 @@ body {
 /* ---------- the quote ---------- */
 .deck {
   flex: 1;
-  touch-action: manipulation;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   display: flex;
   align-items: center;
   padding: 0 var(--pad);
-  cursor: pointer;
-  user-select: none;
+  cursor: grab;
 }
-.quote-wrap { width: 100%; }
+.deck:active { cursor: grabbing; }
+.quote-wrap { width: 100%; will-change: transform; }
+
+.hint {
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: .03em;
+  color: color-mix(in srgb, var(--fg) 60%, transparent);
+  padding: 0 var(--pad) 6px;
+  transition: opacity .5s var(--ease);
+  animation: hintIn .6s var(--ease);
+}
+.hint.is-gone { opacity: 0; pointer-events: none; }
+@keyframes hintIn { from { opacity: 0; } }
 .quote {
   font-weight: 700;
   font-size: clamp(28px, 8.2vw, 46px);

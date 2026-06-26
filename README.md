@@ -8,8 +8,8 @@ Every line is signed **Future**. The content is fully swappable — it ships wit
 
 ## What it does
 
-- **Deck** — the quote sits straight on a full-screen photo. Tap, press → / space, or swipe for the next.
-- **Double-tap to change background** — cycles through the four backgrounds. (Keyboard: `b`.)
+- **Deck** — the quote sits straight on a full-screen photo. **Swipe in any direction** to get the next line (or arrow keys / space on desktop).
+- **Double-tap** anywhere to change the background photo. (Keyboard: `b`.)
 - **Three icons, nothing else** — menu, save (heart), share/save-image.
 - **Save image to gallery** — bakes the current quote + the **FUTURE** signature onto the photo and saves it (native share-sheet → Save Image on mobile, download elsewhere).
 - **Save** — heart a line to keep it in your library.
