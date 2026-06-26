@@ -41,7 +41,7 @@
   function cycleBackground() {
     const i = BACKGROUNDS.findIndex((b) => b.id === state.bgId);
     const nb = BACKGROUNDS[(i + 1) % BACKGROUNDS.length];
-    state.bgId = nb.id; persist(); applyBackground(nb.id); toast(nb.name);
+    state.bgId = nb.id; persist(); applyBackground(nb.id);
   }
 
   /* ---------- deck ---------- */
@@ -162,7 +162,7 @@
       btn.className = "bg-swatch" + (b.id === state.bgId ? " is-current" : "");
       btn.style.background = b.bg; btn.textContent = b.name;
       if (b.image) loadImg(b.image).then(() => { btn.style.backgroundImage = "url(" + b.image + ")"; }).catch(() => {});
-      btn.addEventListener("click", () => { state.bgId = b.id; persist(); applyBackground(b.id); renderBackgrounds(); toast(b.name); });
+      btn.addEventListener("click", () => { state.bgId = b.id; persist(); applyBackground(b.id); renderBackgrounds(); });
       grid.appendChild(btn);
     });
   }
