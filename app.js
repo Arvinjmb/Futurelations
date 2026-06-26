@@ -65,7 +65,7 @@
     if (hIndex < history.length - 1) hIndex++;
     else {
       const q = drawNew();
-      if (!q) { current = { text: "Your deck is empty. Open the menu and tap “Add a line” to start.", _empty: true }; render(); return; }
+      if (!q) { current = { text: "Your deck is empty.", _empty: true }; render(); return; }
       history.push(q); hIndex = history.length - 1;
     }
     current = history[hIndex]; render();
@@ -165,7 +165,7 @@
   }
 
   /* ---------- menu + panels ---------- */
-  const panels = ["saved", "backgrounds", "add", "credits", "settings"];
+  const panels = ["saved", "backgrounds", "credits", "settings"];
   function openMenu() { $("#menu").hidden = false; }
   function closeMenu() { $("#menu").hidden = true; }
   function showPanel(name) {
@@ -198,21 +198,6 @@
       btn.addEventListener("click", () => { state.bgId = b.id; persist(); applyBackground(b.id); renderBackgrounds(); });
       grid.appendChild(btn);
     });
-  }
-  function submitAdd() {
-    const t = $("#addText").value.trim();
-    if (!t) { $("#addNote").textContent = "Type a line first."; return; }
-    state.custom.push({ text: t }); persist();
-    $("#addText").value = ""; $("#addNote").textContent = "Added. It will show up in the deck.";
-    reshuffle();
-    if (!current || current._empty) next();
-    setTimeout(() => { $("#addNote").textContent = ""; }, 2500);
-  }
-  async function exportLines() {
-    if (!state.custom.length) { toast("No added lines yet"); return; }
-    const body = state.custom.map((q) => "  " + JSON.stringify(q.text) + ",").join("\n");
-    try { await navigator.clipboard.writeText(body); toast("Copied " + state.custom.length + " line" + (state.custom.length > 1 ? "s" : "")); }
-    catch (e) { toast("Couldn't copy"); }
   }
 
   /* ---------- gestures: swipe = next, double-tap = background (Pointer Events, all OSes) ---------- */
@@ -318,8 +303,6 @@
     document.querySelectorAll(".menu-link").forEach((l) => l.addEventListener("click", () => showPanel(l.dataset.panel)));
 
     $("#notifyToggle").addEventListener("click", toggleNotify);
-    $("#addSubmit").addEventListener("click", submitAdd);
-    $("#exportBtn").addEventListener("click", exportLines);
     $("#motionToggle").addEventListener("click", () => { state.reduceMotion = !state.reduceMotion; persist(); applyMotion(); });
     $("#installBtn").addEventListener("click", install);
 
