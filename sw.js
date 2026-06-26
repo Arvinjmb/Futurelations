@@ -1,5 +1,5 @@
 /* Futurelations service worker — cache-first for offline use. Bump VERSION to ship updates. */
-const VERSION = "future-v14";
+const VERSION = "future-v15";
 const ASSETS = [
   "./",
   "./index.html",

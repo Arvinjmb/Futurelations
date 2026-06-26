@@ -17,46 +17,8 @@
    ========================================================================= */
 
 const QUOTES = [
-  "Start before you feel ready. Ready is a feeling that arrives after you begin.",
-  "I am not lucky. I am early, consistent, and impossible to discourage.",
-  "The future is just the present with the volume turned up.",
-  "Build quietly. Let the results do the talking.",
-  "Pressure made me. Comfort would have wasted me.",
-  "You become what you repeat, so repeat the good days on purpose.",
-  "I do not chase. I build, and the right things arrive.",
-  "Make the move that scares the smaller version of you.",
-  "Every closed door taught me which walls to build my own door into.",
-  "Speed is a flex. Ship it, then sharpen it.",
-  "I would rather be early and alone than late and crowded.",
-  "Discipline is the loudest thing in a quiet room.",
-  "Bet on the version of you that does the work, not the one that talks about it.",
-  "Greatness is boring up close. It is the same thing done well, again.",
-  "I stopped waiting for permission the day I realized no one was coming with it.",
-  "Your name is a promise. Spend your life keeping it.",
-  "Win in private long before you celebrate in public.",
-  "The plan is simple: outlast the doubt.",
-  "I do not fear the future. I am the one building it.",
-  "Comparison is a thief, and I keep my doors locked.",
-  "Talent opens the door. Showing up keeps it open.",
-  "Be so consistent it looks like luck from the outside.",
-  "The grind is not punishment. It is the price of becoming.",
-  "I turned every no into raw material.",
-  "Rest is part of the work, not a reward for finishing it.",
-  "Choose the hard thing while it is still optional.",
-  "Legends are just regular people who refused to quit on a Tuesday.",
-  "I move like the future already happened and I am just catching up to it.",
-  "Protect your focus like it is the only currency you have. It is.",
-  "The crown was never given. It was outworked.",
-  "Small steps still point at the summit.",
-  "Doubt me quietly. I will answer loudly.",
-  "I do not need the whole staircase, just the next step and the nerve.",
-  "Make your future self proud, not your past self comfortable.",
-  "Everything I wanted was on the other side of consistency.",
-  "Be patient with the dream and impatient with the excuses.",
-  "I am building something that does not need permission to exist.",
-  "The work is the reward. The rest is just receipts.",
-  "Stay in motion. The future does not wait, and neither do I.",
-  "Tomorrow gets the best version of me, and so does today."
+  // Empty. Add your own lines from the in-app menu (Add a line),
+  // or paste them here as "...", one per line.
 ];
 
 const _IMG = (typeof window !== "undefined" && window.SAID_BG_IMAGES) || {};

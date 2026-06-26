@@ -63,7 +63,11 @@
   function drawNew() { if (!pool.length) reshuffle(); return pool.pop(); }
   function next() {
     if (hIndex < history.length - 1) hIndex++;
-    else { history.push(drawNew()); hIndex = history.length - 1; }
+    else {
+      const q = drawNew();
+      if (!q) { current = { text: "Your deck is empty. Open the menu and tap “Add a line” to start.", _empty: true }; render(); return; }
+      history.push(q); hIndex = history.length - 1;
+    }
     current = history[hIndex]; render();
   }
   function prev() {
@@ -82,7 +86,7 @@
 
   /* ---------- save line ---------- */
   function toggleSave() {
-    if (!current) return;
+    if (!current || current._empty) return;
     const id = idOf(current.text);
     const i = state.saved.findIndex((s) => s.id === id);
     if (i >= 0) { state.saved.splice(i, 1); toast("Removed"); }
@@ -134,7 +138,7 @@
 
   let lastBlob = null;
   async function openShareModal() {
-    if (!current) return;
+    if (!current || current._empty) return;
     $("#modal").hidden = false;
     $("#shareImg").removeAttribute("src");
     try { lastBlob = await composeImage(); $("#shareImg").src = URL.createObjectURL(lastBlob); }
@@ -200,7 +204,9 @@
     if (!t) { $("#addNote").textContent = "Type a line first."; return; }
     state.custom.push({ text: t }); persist();
     $("#addText").value = ""; $("#addNote").textContent = "Added. It will show up in the deck.";
-    reshuffle(); setTimeout(() => { $("#addNote").textContent = ""; }, 2500);
+    reshuffle();
+    if (!current || current._empty) next();
+    setTimeout(() => { $("#addNote").textContent = ""; }, 2500);
   }
   async function exportLines() {
     if (!state.custom.length) { toast("No added lines yet"); return; }
