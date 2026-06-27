@@ -37,8 +37,6 @@
     root.setProperty("--bg", b.bg);
     root.setProperty("--fg", b.fg);
     root.setProperty("--accent", b.accent);
-    const deck = document.getElementById("deck");
-    if (deck) { deck.classList.remove("pos-top", "pos-center", "pos-bottom"); deck.classList.add("pos-" + (b.pos || "center")); }
     document.querySelector('meta[name="theme-color"]').setAttribute("content", b.bg);
     if (b.image) {
       loadImg(b.image).then(() => {

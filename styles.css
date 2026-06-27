@@ -66,17 +66,18 @@ body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--pad);
   cursor: grab;
 }
-.deck.pos-top { align-items: flex-start; }
-.deck.pos-top .quote-wrap { margin-top: 11vh; }
-.deck.pos-center { align-items: center; }
-.deck.pos-bottom { align-items: flex-end; }
-.deck.pos-bottom .quote-wrap { margin-bottom: 7vh; }
 .deck:active { cursor: grabbing; }
+.deck__anchor {
+  position: absolute;
+  left: 0; right: 0;
+  top: 60%;
+  transform: translateY(-50%);
+  padding: 0 var(--pad);
+  pointer-events: none;
+  z-index: 1;
+}
 .quote-wrap { width: 100%; will-change: transform; }
 
 .hint {
